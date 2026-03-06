@@ -1,0 +1,5 @@
+C:/Users/Humoy/Projects/PyVerse/native/build/CMakeFiles/pyverse.dir
+C:/Users/Humoy/Projects/PyVerse/native/build/CMakeFiles/edit_cache.dir
+C:/Users/Humoy/Projects/PyVerse/native/build/CMakeFiles/rebuild_cache.dir
+C:/Users/Humoy/Projects/PyVerse/native/build/external/pybind11/CMakeFiles/edit_cache.dir
+C:/Users/Humoy/Projects/PyVerse/native/build/external/pybind11/CMakeFiles/rebuild_cache.dir

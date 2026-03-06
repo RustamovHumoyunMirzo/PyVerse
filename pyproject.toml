@@ -10,6 +10,13 @@ authors = [{name="Rustamov Humoyun Mirzo"}]
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = []
+dynamic = ["classifiers"]
+
+[tool.setuptools.dynamic]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
