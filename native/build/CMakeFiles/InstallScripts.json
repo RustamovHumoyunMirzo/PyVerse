@@ -1,8 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/Users/Humoy/Projects/PyVerse/native/build/cmake_install.cmake",
-		"C:/Users/Humoy/Projects/PyVerse/native/build/external/pybind11/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
