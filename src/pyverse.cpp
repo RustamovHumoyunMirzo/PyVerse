@@ -1,8 +1,7 @@
-#define PY_SSIZE_T_CLEAN
+#define Py_LIMITED_API 0x03080000
 #include <Python.h>
 
-static PyObject* add(PyObject* self, PyObject* args)
-{
+static PyObject* add(PyObject* self, PyObject* args) {
     int a, b;
 
     if (!PyArg_ParseTuple(args, "ii", &a, &b))
@@ -11,7 +10,7 @@ static PyObject* add(PyObject* self, PyObject* args)
     return PyLong_FromLong(a + b);
 }
 
-static PyMethodDef Methods[] = {
+static PyMethodDef methods[] = {
     {"add", add, METH_VARARGS, "Add two numbers"},
     {NULL, NULL, 0, NULL}
 };
@@ -19,12 +18,11 @@ static PyMethodDef Methods[] = {
 static struct PyModuleDef module = {
     PyModuleDef_HEAD_INIT,
     "pyverse",
-    NULL,
+    "PyVerse Native Module",
     -1,
-    Methods
+    methods
 };
 
-PyMODINIT_FUNC PyInit_pyverse(void)
-{
+PyMODINIT_FUNC PyInit_pyverse(void) {
     return PyModule_Create(&module);
 }

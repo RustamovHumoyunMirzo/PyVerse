@@ -1,10 +1,11 @@
 [build-system]
-requires = ["scikit-build", "cmake", "ninja"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "PyVerse"
 version = "0.1.0"
 requires-python = ">=3.8"
-description = "PyVerse framework"
-authors = [{name="Rustamov Humoyun Mirzo"}]
+
+[tool.scikit-build.wheel]
+py-api = "cp38"

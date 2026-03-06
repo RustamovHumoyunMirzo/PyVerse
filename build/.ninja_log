@@ -1,0 +1,13 @@
+# ninja log v7
+26	464	7945261344045705	CMakeFiles/pyverse.dir/src/pyverse.cpp.obj	180b3d95c47cdeab
+1445	1596	7945245690063988	pyverse.dll	dc150893c45d20a9
+2	1132	7945265116104440	build.ninja	69591a6fe3fa006a
+2	1132	7945265116047479	C:/Users/Humoy/Projects/PyVerse/build/cmake_install.cmake	69591a6fe3fa006a
+36	139	7945246547004964	pyverse.pyd	912d28aa03ca4ea8
+465	576	7945261349462009	libpyverse.dll.a	a0af263c0c337d5e
+465	576	7945261349462009	C:/Users/Humoy/Projects/PyVerse/pyverse/pyverse.pyd	a0af263c0c337d5e
+2	151	7945265116104440	build.ninja	69591a6fe3fa006a
+2	151	7945265116104440	C:/Users/Humoy/Projects/PyVerse/build/cmake_install.cmake	69591a6fe3fa006a
+26	287	7945265116744679	CMakeFiles/pyverse.dir/src/pyverse.cpp.obj	ecb39247282562b1
+288	402	7945265120377286	C:/Users/Humoy/Projects/PyVerse/pyverse/pyverse.pyd	bbfb591ef0c2d79a
+288	402	7945265120377286	libpyverse.dll.a	bbfb591ef0c2d79a
