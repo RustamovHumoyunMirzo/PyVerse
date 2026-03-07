@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel", "cmake", "cibuildwheel"]
+requires = ["setuptools>=65", "wheel", "cmake", "cibuildwheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,5 +7,10 @@ name = "PyVerse"
 version = "0.1.0"
 requires-python = ">=3.8"
 
-[tool.cibuildwheel]
-archs = ["AMD64"]
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["pyverse", "pyverse.*"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true

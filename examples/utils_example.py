@@ -1,4 +1,6 @@
 from pyverse import utils
+import pyverse
+print(pyverse.hello())
 
 # Unit conversions
 print(utils.pxToDp(32, dpi=320))         # 16.0
