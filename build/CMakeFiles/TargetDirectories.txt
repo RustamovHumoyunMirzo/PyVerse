@@ -1,3 +1,0 @@
-C:/Users/Humoy/Projects/PyVerse/build/CMakeFiles/pyverse.dir
-C:/Users/Humoy/Projects/PyVerse/build/CMakeFiles/edit_cache.dir
-C:/Users/Humoy/Projects/PyVerse/build/CMakeFiles/rebuild_cache.dir
