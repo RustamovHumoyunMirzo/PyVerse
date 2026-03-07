@@ -1,9 +1,0 @@
-LICENSE
-README.md
-pyproject.toml
-setup.py
-src/pyverse.cpp
-src/PyVerse.egg-info/PKG-INFO
-src/PyVerse.egg-info/SOURCES.txt
-src/PyVerse.egg-info/dependency_links.txt
-src/PyVerse.egg-info/top_level.txt
