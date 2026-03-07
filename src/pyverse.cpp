@@ -1,28 +1,22 @@
-#define Py_LIMITED_API 0x03080000
 #include <Python.h>
 
-static PyObject* add(PyObject* self, PyObject* args) {
-    int a, b;
-
-    if (!PyArg_ParseTuple(args, "ii", &a, &b))
-        return NULL;
-
-    return PyLong_FromLong(a + b);
+static PyObject* hello(PyObject* self, PyObject* args) {
+    return PyUnicode_FromString("Hello from PyVerse!");
 }
 
-static PyMethodDef methods[] = {
-    {"add", add, METH_VARARGS, "Add two numbers"},
+static PyMethodDef PyVerseMethods[] = {
+    {"hello", hello, METH_NOARGS, "Say hello"},
     {NULL, NULL, 0, NULL}
 };
 
-static struct PyModuleDef module = {
+static struct PyModuleDef pyversemodule = {
     PyModuleDef_HEAD_INIT,
     "pyverse",
-    "PyVerse Native Module",
+    "PyVerse module",
     -1,
-    methods
+    PyVerseMethods
 };
 
 PyMODINIT_FUNC PyInit_pyverse(void) {
-    return PyModule_Create(&module);
+    return PyModule_Create(&pyversemodule);
 }

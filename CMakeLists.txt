@@ -1,16 +1,13 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 project(PyVerse LANGUAGES CXX)
 
-include_directories("${CMAKE_SOURCE_DIR}/python_local/include")
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
-add_library(pyverse SHARED src/pyverse.cpp)
+add_library(pyverse MODULE src/pyverse.cpp)
 
-target_link_libraries(pyverse PRIVATE "${CMAKE_SOURCE_DIR}/python_local/libs/python3.lib")
-target_compile_definitions(pyverse PRIVATE Py_LIMITED_API=0x03080000)
+target_include_directories(pyverse PRIVATE ${Python3_INCLUDE_DIRS})
 
 set_target_properties(pyverse PROPERTIES
     PREFIX ""
-    SUFFIX ".pyd"
     OUTPUT_NAME "pyverse"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/pyverse"
 )
