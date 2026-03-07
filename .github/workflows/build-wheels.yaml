@@ -28,8 +28,6 @@ jobs:
           pip install setuptools wheel cmake cibuildwheel
 
       - name: Build wheels
-        env:
-          CIBW_SKIP: "cp314-win_amd64"
         run: |
           cibuildwheel --output-dir wheelhouse
 
@@ -37,7 +35,7 @@ jobs:
         run: ls wheelhouse
 
       - name: Upload built wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pyverse-wheels
           path: wheelhouse/*.whl
