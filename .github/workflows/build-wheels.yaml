@@ -17,13 +17,11 @@ jobs:
       CIBW_ARCHS_LINUX: "x86_64"
       CIBW_ARCHS_MACOS: "x86_64,arm64"
 
-      CIBW_SKIP: "pp*"
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install build tools
+      - name: Install build tools (Linux only)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y build-essential cmake
 
@@ -41,5 +39,5 @@ jobs:
       - name: Upload built wheels
         uses: actions/upload-artifact@v4
         with:
-          name: pyverse-wheels
+          name: pyverse-wheels-${{ matrix.os }}
           path: wheelhouse/*.whl
