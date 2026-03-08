@@ -71,6 +71,8 @@ def ensure_sdl():
         os.remove(dll_zip)
 
         extracted_dirs = [d for d in os.listdir(BASE_DIR) if d.startswith("SDL2-") and os.path.isdir(os.path.join(BASE_DIR, d))]
+        print("===================================================================================")
+        print("Extracted directories:", extracted_dirs)
         if not extracted_dirs:
             raise RuntimeError("SDL2 source folder not found after extraction")
         src_dir = os.path.join(BASE_DIR, extracted_dirs[0])
