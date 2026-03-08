@@ -114,7 +114,7 @@ def ensure_sdl():
         extract_tar(tar_path, BASE_DIR)
         os.remove(tar_path)
 
-        src_dir = os.path.join(BASE_DIR, f"SDL2-{SDL_VERSION}")
+        src_dir = BASE_DIR
         build_dir = os.path.join(BASE_DIR, "build")
         os.makedirs(build_dir, exist_ok=True)
 
