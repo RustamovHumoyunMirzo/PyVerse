@@ -74,21 +74,29 @@ def ensure_sdl():
             extract_zip(dll_zip, os.path.join(BASE_DIR, "bin"))
             os.remove(dll_zip)
 
-            extracted_folders = [
-                f for f in os.listdir(BASE_DIR)
-                if os.path.isdir(os.path.join(BASE_DIR, f)) and f.startswith("SDL2")
+            extracted_dirs = [
+                os.path.join(BASE_DIR, d)
+                for d in os.listdir(BASE_DIR)
+                if d.startswith("SDL2-") and os.path.isdir(os.path.join(BASE_DIR, d))
             ]
-            for folder in extracted_folders:
-                folder_path = os.path.join(BASE_DIR, folder)
-                hdr_src = os.path.join(folder_path, "include")
-                hdr_dst = os.path.join(BASE_DIR, "include")
-                if os.path.isdir(hdr_src):
-                    shutil.move(hdr_src, hdr_dst)
-                lib_src = os.path.join(folder_path, "lib")
-                lib_dst = os.path.join(BASE_DIR, "lib")
-                if os.path.isdir(lib_src):
-                    shutil.move(lib_src, lib_dst)
-                shutil.rmtree(folder_path)
+            
+            if not extracted_dirs:
+                raise RuntimeError("SDL source folder not found after extraction")
+            
+            source_dir = extracted_dirs[0]
+            hdr_src = os.path.join(source_dir, "include")
+            hdr_dst = os.path.join(BASE_DIR, "include")
+            
+            if not os.path.isdir(hdr_src):
+                raise RuntimeError("SDL include directory missing in source archive")
+            
+            if os.path.exists(hdr_dst):
+                shutil.rmtree(hdr_dst)
+            
+            shutil.move(hdr_src, hdr_dst)
+            shutil.rmtree(source_dir)
+            
+            print("SDL2 headers prepared for macOS/Linux.")
 
             dll_src = os.path.join(BASE_DIR, "bin", "SDL2.dll")
             dll_dst = os.path.join("src", "pyverse", "SDL2.dll")
