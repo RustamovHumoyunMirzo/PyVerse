@@ -101,10 +101,28 @@ def ensure_sdl():
         else:
             tar_url = urls["tar"]
             tar_path = os.path.join(BASE_DIR, os.path.basename(tar_url))
+
             download_file(tar_url, tar_path)
             extract_tar(tar_path, BASE_DIR)
             os.remove(tar_path)
-            print("SDL2 source extracted. On macOS/Linux, you may need to build it manually if no prebuilt libs.")
+
+            extracted = [
+                f for f in os.listdir(BASE_DIR)
+                if f.startswith("SDL2-") and os.path.isdir(os.path.join(BASE_DIR, f))
+            ]
+
+            for folder in extracted:
+                folder_path = os.path.join(BASE_DIR, folder)
+
+                hdr_src = os.path.join(folder_path, "include")
+                hdr_dst = os.path.join(BASE_DIR, "include")
+
+                if os.path.isdir(hdr_src):
+                    shutil.move(hdr_src, hdr_dst)
+
+                shutil.rmtree(folder_path)
+
+            print("SDL2 headers prepared for macOS/Linux.")
 
     if not os.path.isfile(include_path):
         print(f"ERROR: SDL2 headers not found at {include_path}")
