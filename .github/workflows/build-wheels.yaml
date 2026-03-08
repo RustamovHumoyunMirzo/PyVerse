@@ -23,11 +23,14 @@ jobs:
 
       - name: Install build tools (Linux only)
         if: runner.os == 'Linux'
-        run: sudo apt-get install -y build-essential cmake pkg-config ninja-build nasm
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake pkg-config ninja-build autoconf automake libtool
 
       - name: Install build tools (macOS only)
         if: runner.os == 'macOS'
-        run: brew install cmake pkg-config nasm ninja
+        run: |
+          brew install cmake pkg-config ninja
 
       - name: Install build dependencies
         run: |
