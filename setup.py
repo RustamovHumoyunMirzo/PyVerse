@@ -17,7 +17,7 @@ if PLATFORM == "Windows":
     library_dirs.append(os.path.join(SDL_ROOT, "lib", "x64"))
     libraries.append("SDL2")
 
-    dll_src = os.path.join(SDL_ROOT, "bin", "SDL2.dll")
+    dll_src = os.path.join(SDL_ROOT, "lib", "x64", "SDL2.dll")
     dll_dst = os.path.join("src", "pyverse", "SDL2.dll")
     os.makedirs(os.path.dirname(dll_dst), exist_ok=True)
     if os.path.isfile(dll_src):
@@ -46,7 +46,6 @@ ext_modules = [
         libraries=libraries,
         extra_objects=extra_objects,
         language="c++",
-        extra_compile_args=["-std=c++17"]
     )
 ]
 
