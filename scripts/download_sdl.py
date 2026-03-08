@@ -9,14 +9,19 @@ import subprocess
 
 SDL_VERSION = "2.32.10"
 BASE_DIR = os.path.abspath("deps/SDL2")
+
 PLATFORM = sys.platform
+IS_WINDOWS = PLATFORM.lower().startswith("win")
+IS_LINUX = PLATFORM.lower().startswith("linux")
+IS_MAC = PLATFORM.lower().startswith("darwin")
+
 ARCH = platform.architecture()[0]
 
 def get_urls():
     urls = {}
-    if PLATFORM.startswith("win"):
+    if IS_WINDOWS:
         urls["dev"] = f"https://www.libsdl.org/release/SDL2-devel-{SDL_VERSION}-VC.zip"
-    elif PLATFORM.startswith("linux") or PLATFORM.startswith("darwin"):
+    elif IS_LINUX or IS_MAC:
         urls["tar"] = f"https://www.libsdl.org/release/SDL2-{SDL_VERSION}.tar.gz"
     else:
         raise RuntimeError(f"Unsupported platform: {PLATFORM}")
@@ -33,7 +38,6 @@ def download_file(url, dest_path):
 def extract_zip(zip_path, dest_dir):
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
         members = zip_ref.namelist()
-        top_level = members[0].split("/")[0]
         for member in members:
             path_inside_zip = "/".join(member.split("/")[1:])
             if not path_inside_zip:
@@ -49,37 +53,22 @@ def extract_zip(zip_path, dest_dir):
 
 def extract_tar(tar_path, dest_dir):
     with tarfile.open(tar_path, "r:gz") as tar_ref:
-        members = tar_ref.getmembers()
-        top_level = members[0].name.split("/")[0]
         tar_ref.extractall(dest_dir)
     print(f"Extracted {tar_path} to {dest_dir}")
-
-    extracted_dir = os.path.join(dest_dir, top_level)
-    for item in os.listdir(extracted_dir):
-        src = os.path.join(extracted_dir, item)
-        dst = os.path.join(dest_dir, item)
-        if os.path.exists(dst):
-            if os.path.isdir(dst):
-                shutil.rmtree(dst)
-            else:
-                os.remove(dst)
-        shutil.move(src, dst)
-    shutil.rmtree(extracted_dir)
-    print(f"Flattened {top_level} into {dest_dir}")
 
 def ensure_sdl():
     include_path = os.path.join(BASE_DIR, "include", "SDL.h")
     lib_path = os.path.join(BASE_DIR, "lib")
-    dll_path = os.path.join(lib_path, "SDL2.dll")
 
-    if os.path.isfile(include_path) and (PLATFORM.startswith("win") and os.path.isfile(dll_path) or PLATFORM != "win"):
+    dll_path = os.path.join(lib_path, "SDL2.dll")
+    if os.path.isfile(include_path) and (IS_WINDOWS and os.path.isfile(dll_path) or not IS_WINDOWS):
         print(f"SDL2 already exists at {BASE_DIR}")
         return
 
     os.makedirs(BASE_DIR, exist_ok=True)
     urls = get_urls()
 
-    if PLATFORM.startswith("win"):
+    if IS_WINDOWS:
         dev_url = urls["dev"]
         dev_zip = os.path.join(BASE_DIR, os.path.basename(dev_url))
         download_file(dev_url, dev_zip)
@@ -128,9 +117,12 @@ def ensure_sdl():
     if not os.path.isfile(include_path):
         print(f"ERROR: SDL2 headers not found at {include_path}")
         sys.exit(1)
-    if PLATFORM != "win" and not os.path.isfile(os.path.join(lib_path, "libSDL2.a")):
-        print(f"ERROR: SDL2 static library not found at {lib_path}/libSDL2.a")
-        sys.exit(1)
+
+    if not IS_WINDOWS:
+        lib_static = os.path.join(lib_path, "libSDL2.a")
+        if not os.path.isfile(lib_static):
+            print(f"ERROR: SDL2 static library not found at {lib_static}")
+            sys.exit(1)
 
     print(f"SDL2 is ready at {BASE_DIR}")
 
