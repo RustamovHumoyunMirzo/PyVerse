@@ -16,30 +16,23 @@ def get_urls():
     urls = {}
     if PLATFORM.startswith("win"):
         urls["dev"] = f"https://www.libsdl.org/release/SDL2-devel-{SDL_VERSION}-VC.zip"
-        urls["dll"] = f"https://www.libsdl.org/release/SDL2-{SDL_VERSION}-win32-x64.zip"
-    elif PLATFORM == "darwin" or PLATFORM.startswith("linux"):
+    elif PLATFORM.startswith("darwin") or PLATFORM.startswith("linux"):
         urls["tar"] = f"https://www.libsdl.org/release/SDL2-{SDL_VERSION}.tar.gz"
     else:
         raise RuntimeError(f"Unsupported platform: {PLATFORM}")
     return urls
 
 def download_file(url, dest_path):
+    if os.path.exists(dest_path):
+        print(f"Already downloaded {dest_path}")
+        return
     print(f"Downloading {url}...")
     urllib.request.urlretrieve(url, dest_path)
     print(f"Saved to {dest_path}")
 
-def extract_zip(zip_path, dest_dir, flatten_top=True):
+def extract_zip(zip_path, dest_dir):
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
-        members = zip_ref.namelist()
-        for member in members:
-            path_parts = member.split("/", 1)
-            target_path = os.path.join(dest_dir, path_parts[1] if len(path_parts) > 1 else member)
-            if member.endswith("/"):
-                os.makedirs(target_path, exist_ok=True)
-            else:
-                os.makedirs(os.path.dirname(target_path), exist_ok=True)
-                with open(target_path, "wb") as f:
-                    f.write(zip_ref.read(member))
+        zip_ref.extractall(dest_dir)
     print(f"Extracted {zip_path} to {dest_dir}")
 
 def extract_tar(tar_path, dest_dir):
@@ -63,14 +56,10 @@ def ensure_sdl():
         dev_url = urls["dev"]
         dev_zip = os.path.join(BASE_DIR, os.path.basename(dev_url))
         download_file(dev_url, dev_zip)
-        extract_zip(dev_zip, BASE_DIR, flatten_top=False)
+        extract_zip(dev_zip, BASE_DIR)
         os.remove(dev_zip)
 
-        include_dir = os.path.join(BASE_DIR, "include")
         lib_dir = os.path.join(BASE_DIR, "lib", "x64")
-        if not os.path.isdir(include_dir) or not os.path.isdir(lib_dir):
-            raise RuntimeError("SDL include/lib directories not found after extraction")
-
         dll_src = os.path.join(lib_dir, "SDL2.dll")
         dll_dst = os.path.join("src", "pyverse", "SDL2.dll")
         os.makedirs(os.path.dirname(dll_dst), exist_ok=True)
