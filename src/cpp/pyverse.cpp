@@ -1,22 +1,12 @@
-#include <Python.h>
+#include <pybind11/pybind11.h>
 
-static PyObject* hello(PyObject* self, PyObject* args) {
-    return PyUnicode_FromString("Hello from PyVerse!");
+namespace py = pybind11;
+
+int add(int a, int b) {
+    return a + b;
 }
 
-static PyMethodDef PyVerseMethods[] = {
-    {"hello", hello, METH_NOARGS, "Say hello"},
-    {NULL, NULL, 0, NULL}
-};
-
-static struct PyModuleDef pyversemodule = {
-    PyModuleDef_HEAD_INIT,
-    "pyverse",
-    "PyVerse module",
-    -1,
-    PyVerseMethods
-};
-
-PyMODINIT_FUNC PyInit_pyverse(void) {
-    return PyModule_Create(&pyversemodule);
+PYBIND11_MODULE(example, m) {
+    m.doc() = "Example pybind11 module";
+    m.def("add", &add, "Add two numbers");
 }
