@@ -97,6 +97,15 @@ def ensure_sdl():
         ], cwd=build_dir)
         print("SDL2 built and installed successfully.")
 
+    print(f"Listing all files in {BASE_DIR}:")
+
+    BASE_DIRt = os.path.abspath("deps")
+    for root, dirs, files in os.walk(BASE_DIRt):
+        for name in files:
+            file_path = os.path.join(root, name)
+            rel_path = os.path.relpath(file_path, BASE_DIRt)
+            print(f"- {rel_path}")
+
     if not os.path.isfile(include_path):
         print(f"ERROR: SDL2 headers not found at {include_path}")
         sys.exit(1)
