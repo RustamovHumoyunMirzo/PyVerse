@@ -20,3 +20,6 @@ include = ["pyverse", "pyverse.*"]
 [tool.setuptools]
 package-dir = {"" = "src"}
 include-package-data = true
+
+[tool.cibuildwheel]
+before-all = "python scripts/download_sdl.py"
