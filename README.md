@@ -1,3 +1,5 @@
+<img src="images/PyVerseIcon.png" alt="PyVerse icon" width="200" height="200">
+
 # PyVerse
 
 A powerful Python framework for building modern desktop and mobile applications using web technologies. It allows developers to create rich user interfaces with HTML, CSS, and JavaScript while keeping the core logic in Python.
