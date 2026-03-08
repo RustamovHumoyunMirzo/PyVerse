@@ -49,8 +49,23 @@ def extract_zip(zip_path, dest_dir):
 
 def extract_tar(tar_path, dest_dir):
     with tarfile.open(tar_path, "r:gz") as tar_ref:
+        members = tar_ref.getmembers()
+        top_level = members[0].name.split("/")[0]
         tar_ref.extractall(dest_dir)
     print(f"Extracted {tar_path} to {dest_dir}")
+
+    extracted_dir = os.path.join(dest_dir, top_level)
+    for item in os.listdir(extracted_dir):
+        src = os.path.join(extracted_dir, item)
+        dst = os.path.join(dest_dir, item)
+        if os.path.exists(dst):
+            if os.path.isdir(dst):
+                shutil.rmtree(dst)
+            else:
+                os.remove(dst)
+        shutil.move(src, dst)
+    shutil.rmtree(extracted_dir)
+    print(f"Flattened {top_level} into {dest_dir}")
 
 def ensure_sdl():
     include_path = os.path.join(BASE_DIR, "include", "SDL.h")
