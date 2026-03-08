@@ -1,4 +1,4 @@
-from asyncio import subprocess
+import subprocess
 import os
 import sys
 import platform
@@ -133,17 +133,26 @@ def ensure_sdl():
 
             print("Building SDL2...")
 
+            source_dir = os.path.join(BASE_DIR, f"SDL2-{SDL_VERSION}")
             build_dir = os.path.join(BASE_DIR, "build")
+
             os.makedirs(build_dir, exist_ok=True)
 
             subprocess.check_call([
                 "cmake",
-                "..",
+                source_dir,
                 "-DSDL_SHARED=OFF",
-                "-DSDL_STATIC=ON"
+                "-DSDL_STATIC=ON",
+                "-DCMAKE_OSX_ARCHITECTURES=x86_64;arm64"
             ], cwd=build_dir)
 
-            subprocess.check_call(["cmake", "--build", ".", "--config", "Release"], cwd=build_dir)
+            subprocess.check_call([
+                "cmake",
+                "--build",
+                ".",
+                "--config",
+                "Release"
+            ], cwd=build_dir)
 
             print("SDL2 built successfully.")
 

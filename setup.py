@@ -11,6 +11,8 @@ include_dirs = [pybind11.get_include()]
 library_dirs = []
 libraries = []
 
+extra_objects = []
+
 package_data = {}
 
 if PLATFORM == "Windows":
