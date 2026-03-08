@@ -60,27 +60,18 @@ def ensure_sdl():
     urls = get_urls()
 
     if PLATFORM.startswith("win"):
-        dev_zip = os.path.join(BASE_DIR, os.path.basename(urls["dev"]))
-        download_file(urls["dev"], dev_zip)
-        extract_zip(dev_zip, BASE_DIR)
+        dev_url = urls["dev"]
+        dev_zip = os.path.join(BASE_DIR, os.path.basename(dev_url))
+        download_file(dev_url, dev_zip)
+        extract_zip(dev_zip, BASE_DIR, flatten_top=False)
         os.remove(dev_zip)
 
-        dll_zip = os.path.join(BASE_DIR, os.path.basename(urls["dll"]))
-        download_file(urls["dll"], dll_zip)
-        extract_zip(dll_zip, os.path.join(BASE_DIR, "bin"))
-        os.remove(dll_zip)
+        include_dir = os.path.join(BASE_DIR, "include")
+        lib_dir = os.path.join(BASE_DIR, "lib", "x64")
+        if not os.path.isdir(include_dir) or not os.path.isdir(lib_dir):
+            raise RuntimeError("SDL include/lib directories not found after extraction")
 
-        extracted_dirs = [d for d in os.listdir(BASE_DIR) if d.startswith("SDL2-") and os.path.isdir(os.path.join(BASE_DIR, d))]
-        print("===================================================================================")
-        print("Extracted directories:", extracted_dirs)
-        if not extracted_dirs:
-            raise RuntimeError("SDL2 source folder not found after extraction")
-        src_dir = os.path.join(BASE_DIR, extracted_dirs[0])
-        shutil.move(os.path.join(src_dir, "include"), os.path.join(BASE_DIR, "include"))
-        shutil.move(os.path.join(src_dir, "lib"), os.path.join(BASE_DIR, "lib"))
-        shutil.rmtree(src_dir)
-
-        dll_src = os.path.join(BASE_DIR, "bin", "SDL2.dll")
+        dll_src = os.path.join(lib_dir, "SDL2.dll")
         dll_dst = os.path.join("src", "pyverse", "SDL2.dll")
         os.makedirs(os.path.dirname(dll_dst), exist_ok=True)
         if os.path.isfile(dll_src):
