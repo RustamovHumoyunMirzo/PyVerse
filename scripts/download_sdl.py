@@ -128,8 +128,8 @@ def ensure_sdl():
     if not os.path.isfile(include_path):
         print(f"ERROR: SDL2 headers not found at {include_path}")
         sys.exit(1)
-    if PLATFORM != "win" and not os.path.isfile(os.path.join(lib_path, "SDL2.a")):
-        print(f"ERROR: SDL2 static library not found at {lib_path}/SDL2.a")
+    if PLATFORM != "win" and not os.path.isfile(os.path.join(lib_path, "libSDL2.a")):
+        print(f"ERROR: SDL2 static library not found at {lib_path}/libSDL2.a")
         sys.exit(1)
 
     print(f"SDL2 is ready at {BASE_DIR}")
