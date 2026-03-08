@@ -1,2 +1,6 @@
 import pyverse
-print(pyverse.add(2,3))
+import time
+
+pyverse.create_window(800, 600)
+time.sleep(3)
+pyverse.destroy_window()
