@@ -1,31 +1,20 @@
 import os
 import sys
 import platform
-import urllib.request
-import zipfile
-import tarfile
 import shutil
 import subprocess
+import urllib.request
+import zipfile
 
 SDL_VERSION = "2.32.10"
 BASE_DIR = os.path.abspath("deps/SDL2")
 
 PLATFORM = sys.platform
-IS_WINDOWS = PLATFORM.lower().startswith("win")
-IS_LINUX = PLATFORM.lower().startswith("linux")
-IS_MAC = PLATFORM.lower().startswith("darwin")
+IS_WINDOWS = PLATFORM.startswith("win")
+IS_LINUX = PLATFORM.startswith("linux")
+IS_MAC = PLATFORM.startswith("darwin")
 
 ARCH = platform.architecture()[0]
-
-def get_urls():
-    urls = {}
-    if IS_WINDOWS:
-        urls["dev"] = f"https://www.libsdl.org/release/SDL2-devel-{SDL_VERSION}-VC.zip"
-    elif IS_LINUX or IS_MAC:
-        urls["tar"] = f"https://www.libsdl.org/release/SDL2-{SDL_VERSION}.tar.gz"
-    else:
-        raise RuntimeError(f"Unsupported platform: {PLATFORM}")
-    return urls
 
 def download_file(url, dest_path):
     if os.path.exists(dest_path):
@@ -37,24 +26,8 @@ def download_file(url, dest_path):
 
 def extract_zip(zip_path, dest_dir):
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
-        members = zip_ref.namelist()
-        for member in members:
-            path_inside_zip = "/".join(member.split("/")[1:])
-            if not path_inside_zip:
-                continue
-            target_path = os.path.join(dest_dir, path_inside_zip)
-            if member.endswith("/"):
-                os.makedirs(target_path, exist_ok=True)
-            else:
-                os.makedirs(os.path.dirname(target_path), exist_ok=True)
-                with open(target_path, "wb") as f:
-                    f.write(zip_ref.read(member))
+        zip_ref.extractall(dest_dir)
     print(f"Extracted {zip_path} to {dest_dir}")
-
-def extract_tar(tar_path, dest_dir):
-    with tarfile.open(tar_path, "r:gz") as tar_ref:
-        tar_ref.extractall(dest_dir)
-    print(f"Extracted {tar_path} to {dest_dir}")
 
 def ensure_sdl():
     include_path = os.path.join(BASE_DIR, "include", "SDL.h")
@@ -66,14 +39,13 @@ def ensure_sdl():
         return
 
     os.makedirs(BASE_DIR, exist_ok=True)
-    urls = get_urls()
 
     if IS_WINDOWS:
-        dev_url = urls["dev"]
-        dev_zip = os.path.join(BASE_DIR, os.path.basename(dev_url))
-        download_file(dev_url, dev_zip)
-        extract_zip(dev_zip, BASE_DIR)
-        os.remove(dev_zip)
+        url = f"https://www.libsdl.org/release/SDL2-devel-{SDL_VERSION}-VC.zip"
+        zip_path = os.path.join(BASE_DIR, os.path.basename(url))
+        download_file(url, zip_path)
+        extract_zip(zip_path, BASE_DIR)
+        os.remove(zip_path)
 
         lib_dir = os.path.join(BASE_DIR, "lib", "x64")
         dll_src = os.path.join(lib_dir, "SDL2.dll")
@@ -86,16 +58,20 @@ def ensure_sdl():
             print(f"Warning: SDL2.dll not found at {dll_src}")
 
     else:
-        tar_url = urls["tar"]
-        tar_path = os.path.join(BASE_DIR, os.path.basename(tar_url))
-        download_file(tar_url, tar_path)
-        extract_tar(tar_path, BASE_DIR)
-        os.remove(tar_path)
+        if not os.path.exists(os.path.join(BASE_DIR, "CMakeLists.txt")):
+            print(f"Cloning SDL2 CMake repo (release-{SDL_VERSION})...")
+            subprocess.check_call([
+                "git", "clone",
+                "--branch", f"release-{SDL_VERSION}",
+                "https://github.com/libsdl-org/SDL.git",
+                BASE_DIR
+            ])
+        else:
+            print("SDL2 repo already cloned")
 
         build_dir = os.path.join(BASE_DIR, "build")
         os.makedirs(build_dir, exist_ok=True)
         print("Building SDL2 (static)...")
-
         subprocess.check_call([
             "cmake",
             BASE_DIR,
