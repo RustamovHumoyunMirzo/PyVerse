@@ -3,7 +3,7 @@ from setuptools import setup, Extension, find_packages
 ext_modules = [
     Extension(
         "pyverse.pyverse",
-        sources=["src/pyverse.cpp"],
+        sources=["src/cpp/pyverse.cpp"],
         extra_compile_args=["/O2"],
     )
 ]
