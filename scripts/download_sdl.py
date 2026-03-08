@@ -32,7 +32,19 @@ def download_file(url, dest_path):
 
 def extract_zip(zip_path, dest_dir):
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
-        zip_ref.extractall(dest_dir)
+        members = zip_ref.namelist()
+        top_level = members[0].split("/")[0]
+        for member in members:
+            path_inside_zip = "/".join(member.split("/")[1:])
+            if not path_inside_zip:
+                continue
+            target_path = os.path.join(dest_dir, path_inside_zip)
+            if member.endswith("/"):
+                os.makedirs(target_path, exist_ok=True)
+            else:
+                os.makedirs(os.path.dirname(target_path), exist_ok=True)
+                with open(target_path, "wb") as f:
+                    f.write(zip_ref.read(member))
     print(f"Extracted {zip_path} to {dest_dir}")
 
 def extract_tar(tar_path, dest_dir):
@@ -96,15 +108,6 @@ def ensure_sdl():
             "--target", "install"
         ], cwd=build_dir)
         print("SDL2 built and installed successfully.")
-
-    print(f"Listing all files in {BASE_DIR}:")
-
-    BASE_DIRt = os.path.abspath("deps")
-    for root, dirs, files in os.walk(BASE_DIRt):
-        for name in files:
-            file_path = os.path.join(root, name)
-            rel_path = os.path.relpath(file_path, BASE_DIRt)
-            print(f"- {rel_path}")
 
     if not os.path.isfile(include_path):
         print(f"ERROR: SDL2 headers not found at {include_path}")
