@@ -43,7 +43,7 @@ def extract_tar(tar_path, dest_dir):
 def ensure_sdl():
     include_path = os.path.join(BASE_DIR, "include", "SDL.h")
     lib_path = os.path.join(BASE_DIR, "lib")
-    dll_path = os.path.join(BASE_DIR, "bin", "SDL2.dll")
+    dll_path = os.path.join(lib_path, "SDL2.dll")
 
     if os.path.isfile(include_path) and (PLATFORM.startswith("win") and os.path.isfile(dll_path) or PLATFORM != "win"):
         print(f"SDL2 already exists at {BASE_DIR}")
