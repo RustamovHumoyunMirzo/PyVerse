@@ -29,6 +29,19 @@ def extract_zip(zip_path, dest_dir):
         zip_ref.extractall(dest_dir)
     print(f"Extracted {zip_path} to {dest_dir}")
 
+def flatten_folder(top_dir, target_dir):
+    for item in os.listdir(top_dir):
+        src = os.path.join(top_dir, item)
+        dst = os.path.join(target_dir, item)
+        if os.path.exists(dst):
+            if os.path.isdir(dst):
+                shutil.rmtree(dst)
+            else:
+                os.remove(dst)
+        shutil.move(src, dst)
+    shutil.rmtree(top_dir)
+    print(f"Flattened {top_dir} into {target_dir}")
+
 def ensure_sdl():
     include_path = os.path.join(BASE_DIR, "include", "SDL.h")
     lib_path = os.path.join(BASE_DIR, "lib")
@@ -47,8 +60,11 @@ def ensure_sdl():
         extract_zip(zip_path, BASE_DIR)
         os.remove(zip_path)
 
-        lib_dir = os.path.join(BASE_DIR, "lib", "x64")
-        dll_src = os.path.join(lib_dir, "SDL2.dll")
+        top_dir = os.path.join(BASE_DIR, f"SDL2-{SDL_VERSION}")
+        if os.path.exists(top_dir):
+            flatten_folder(top_dir, BASE_DIR)
+
+        dll_src = os.path.join(BASE_DIR, "lib", "x64", "SDL2.dll")
         dll_dst = os.path.join("src", "pyverse", "SDL2.dll")
         os.makedirs(os.path.dirname(dll_dst), exist_ok=True)
         if os.path.isfile(dll_src):
@@ -97,7 +113,6 @@ def ensure_sdl():
     if not IS_WINDOWS:
         lib_static = os.path.join(lib_path, "libSDL2.a")
         if not os.path.isfile(lib_static):
-            print(f"ERROR: SDL2 static library not found at {lib_static}")
             sys.exit(1)
 
     print(f"SDL2 is ready at {BASE_DIR}")
