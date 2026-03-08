@@ -6,7 +6,8 @@ int add(int a, int b) {
     return a + b;
 }
 
-PYBIND11_MODULE(example, m) {
-    m.doc() = "Example pybind11 module";
+PYBIND11_MODULE(pyverse, m) {
+    m.doc() = "PyVerse module";
+
     m.def("add", &add, "Add two numbers");
 }
