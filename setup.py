@@ -2,6 +2,7 @@ import os
 import platform
 from setuptools import setup, Extension, find_packages
 import pybind11
+import shutil
 
 SDL_ROOT = os.path.abspath("deps/SDL2")
 PLATFORM = platform.system()
@@ -16,12 +17,16 @@ if PLATFORM == "Windows":
     include_dirs.append(os.path.join(SDL_ROOT, "include"))
     library_dirs.append(os.path.join(SDL_ROOT, "lib", "x64"))
     libraries.append("SDL2")
-
-    dll_path = os.path.join(SDL_ROOT, "bin", "SDL2.dll")
-    if os.path.isfile(dll_path):
-        package_data["pyverse"] = ["SDL2.dll"]
+    dll_src = os.path.join(SDL_ROOT, "bin", "SDL2.dll")
+    dll_dst = os.path.join("src", "pyverse", "SDL2.dll")
+    os.makedirs(os.path.dirname(dll_dst), exist_ok=True)
+    if os.path.isfile(dll_src):
+        shutil.copy2(dll_src, dll_dst)
+        print(f"Copied SDL2.dll into {dll_dst}")
     else:
-        print("Warning: SDL2.dll not found, the Windows wheel may fail at runtime!")
+        print(f"Warning: {dll_src} not found, wheel may fail at runtime")
+    
+    package_data = {"pyverse": ["SDL2.dll"]}
 
 elif PLATFORM == "Darwin":
     include_dirs.append(os.path.join(SDL_ROOT, "include"))
