@@ -28,14 +28,15 @@ if PLATFORM == "Windows":
     
     package_data = {"pyverse": ["SDL2.dll"]}
 
-elif PLATFORM == "Darwin":
+elif PLATFORM == "Darwin" or PLATFORM.startswith("Linux"):
     include_dirs.append(os.path.join(SDL_ROOT, "include"))
-    library_dirs.append(os.path.join(SDL_ROOT, "lib"))
-    libraries.append("SDL2")
-elif PLATFORM.startswith("Linux"):
-    include_dirs.append(os.path.join(SDL_ROOT, "include"))
-    library_dirs.append(os.path.join(SDL_ROOT, "lib"))
-    libraries.append("SDL2")
+
+    sdl_static = os.path.join(SDL_ROOT, "build", "libSDL2.a")
+
+    if os.path.isfile(sdl_static):
+        extra_objects = [sdl_static]
+    else:
+        raise RuntimeError("libSDL2.a not found. SDL must be built first.")
 
 ext_modules = [
     Extension(
@@ -44,7 +45,9 @@ ext_modules = [
         include_dirs=include_dirs,
         library_dirs=library_dirs,
         libraries=libraries,
+        extra_objects=extra_objects if 'extra_objects' in globals() else [],
         language="c++",
+        extra_compile_args=["-std=c++17"]
     )
 ]
 

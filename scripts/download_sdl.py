@@ -1,3 +1,4 @@
+from asyncio import subprocess
 import os
 import sys
 import platform
@@ -122,7 +123,21 @@ def ensure_sdl():
 
                 shutil.rmtree(folder_path)
 
-            print("SDL2 headers prepared for macOS/Linux.")
+            print("Building SDL2...")
+
+            build_dir = os.path.join(BASE_DIR, "build")
+            os.makedirs(build_dir, exist_ok=True)
+
+            subprocess.check_call([
+                "cmake",
+                "..",
+                "-DSDL_SHARED=OFF",
+                "-DSDL_STATIC=ON"
+            ], cwd=build_dir)
+
+            subprocess.check_call(["cmake", "--build", ".", "--config", "Release"], cwd=build_dir)
+
+            print("SDL2 built successfully.")
 
     if not os.path.isfile(include_path):
         print(f"ERROR: SDL2 headers not found at {include_path}")
