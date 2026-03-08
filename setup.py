@@ -7,14 +7,13 @@ import shutil
 SDL_ROOT = os.path.abspath("deps/SDL2")
 PLATFORM = platform.system()
 
-include_dirs = [pybind11.get_include()]
+include_dirs = [pybind11.get_include(), os.path.join(SDL_ROOT, "include")]
 library_dirs = []
 libraries = []
 extra_objects = []
 package_data = {}
 
 if PLATFORM == "Windows":
-    include_dirs.append(os.path.join(SDL_ROOT, "include"))
     library_dirs.append(os.path.join(SDL_ROOT, "lib", "x64"))
     libraries.append("SDL2")
 
@@ -26,21 +25,17 @@ if PLATFORM == "Windows":
         print(f"Copied SDL2.dll into {dll_dst}")
     else:
         print(f"Warning: {dll_src} not found, wheel may fail at runtime")
-
+    
     package_data = {"pyverse": ["SDL2.dll"]}
 
-elif PLATFORM in ("Darwin", "Linux") or PLATFORM.startswith("linux"):
-    include_dirs.append(os.path.join(SDL_ROOT, "include"))
-    sdl_static = os.path.join(SDL_ROOT, "lib", "x64", "SDL2.a")
+elif PLATFORM in ["Darwin", "Linux"]:
+    lib_static = os.path.join(SDL_ROOT, "lib", "libSDL2.a")
+    if not os.path.isfile(lib_static):
+        raise RuntimeError(f"{lib_static} not found. SDL must be built first.")
+    extra_objects = [lib_static]
 
-    if os.path.isfile(sdl_static):
-        extra_objects = [sdl_static]
-        print(f"Using SDL2 static library at {sdl_static}")
-    else:
-        raise RuntimeError(
-            f"SDL2 static library not found at {sdl_static}. "
-            "Please ensure you downloaded SDL2 and have libSDL2.a in deps/SDL2/lib/x64"
-        )
+else:
+    raise RuntimeError(f"Unsupported platform: {PLATFORM}")
 
 ext_modules = [
     Extension(
@@ -51,7 +46,7 @@ ext_modules = [
         libraries=libraries,
         extra_objects=extra_objects,
         language="c++",
-        extra_compile_args=["-std=c++17"],
+        extra_compile_args=["-std=c++17"]
     )
 ]
 

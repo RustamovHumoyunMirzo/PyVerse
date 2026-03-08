@@ -5,19 +5,19 @@ import urllib.request
 import zipfile
 import tarfile
 import shutil
+import subprocess
 
 SDL_VERSION = "2.32.10"
 BASE_DIR = os.path.abspath("deps/SDL2")
 PLATFORM = sys.platform
+ARCH = platform.architecture()[0]
 
 def get_urls():
     urls = {}
     if PLATFORM.startswith("win"):
         urls["dev"] = f"https://www.libsdl.org/release/SDL2-devel-{SDL_VERSION}-VC.zip"
         urls["dll"] = f"https://www.libsdl.org/release/SDL2-{SDL_VERSION}-win32-x64.zip"
-    elif PLATFORM == "darwin":
-        urls["tar"] = f"https://www.libsdl.org/release/SDL2-{SDL_VERSION}.tar.gz"
-    elif PLATFORM.startswith("linux"):
+    elif PLATFORM == "darwin" or PLATFORM.startswith("linux"):
         urls["tar"] = f"https://www.libsdl.org/release/SDL2-{SDL_VERSION}.tar.gz"
     else:
         raise RuntimeError(f"Unsupported platform: {PLATFORM}")
@@ -28,9 +28,18 @@ def download_file(url, dest_path):
     urllib.request.urlretrieve(url, dest_path)
     print(f"Saved to {dest_path}")
 
-def extract_zip(zip_path, dest_dir):
+def extract_zip(zip_path, dest_dir, flatten_top=True):
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
-        zip_ref.extractall(dest_dir)
+        members = zip_ref.namelist()
+        for member in members:
+            path_parts = member.split("/", 1)
+            target_path = os.path.join(dest_dir, path_parts[1] if len(path_parts) > 1 else member)
+            if member.endswith("/"):
+                os.makedirs(target_path, exist_ok=True)
+            else:
+                os.makedirs(os.path.dirname(target_path), exist_ok=True)
+                with open(target_path, "wb") as f:
+                    f.write(zip_ref.read(member))
     print(f"Extracted {zip_path} to {dest_dir}")
 
 def extract_tar(tar_path, dest_dir):
@@ -40,8 +49,11 @@ def extract_tar(tar_path, dest_dir):
 
 def ensure_sdl():
     include_path = os.path.join(BASE_DIR, "include", "SDL.h")
-    if os.path.isfile(include_path):
-        print(f"SDL2 headers already exist at {include_path}")
+    lib_path = os.path.join(BASE_DIR, "lib")
+    dll_path = os.path.join(BASE_DIR, "bin", "SDL2.dll")
+
+    if os.path.isfile(include_path) and (PLATFORM.startswith("win") and os.path.isfile(dll_path) or PLATFORM != "win"):
+        print(f"SDL2 already exists at {BASE_DIR}")
         return
 
     os.makedirs(BASE_DIR, exist_ok=True)
@@ -58,20 +70,13 @@ def ensure_sdl():
         extract_zip(dll_zip, os.path.join(BASE_DIR, "bin"))
         os.remove(dll_zip)
 
-        extracted_dirs = [
-            d for d in os.listdir(BASE_DIR)
-            if d.startswith("SDL2") and os.path.isdir(os.path.join(BASE_DIR, d))
-        ]
+        extracted_dirs = [d for d in os.listdir(BASE_DIR) if d.startswith("SDL2-") and os.path.isdir(os.path.join(BASE_DIR, d))]
         if not extracted_dirs:
-            raise RuntimeError("SDL source folder not found after extraction")
-
-        hdr_src = os.path.join(BASE_DIR, extracted_dirs[0], "include")
-        hdr_dst = os.path.join(BASE_DIR, "include")
-        if os.path.exists(hdr_dst):
-            shutil.rmtree(hdr_dst)
-        shutil.move(hdr_src, hdr_dst)
-
-        shutil.rmtree(os.path.join(BASE_DIR, extracted_dirs[0]))
+            raise RuntimeError("SDL2 source folder not found after extraction")
+        src_dir = os.path.join(BASE_DIR, extracted_dirs[0])
+        shutil.move(os.path.join(src_dir, "include"), os.path.join(BASE_DIR, "include"))
+        shutil.move(os.path.join(src_dir, "lib"), os.path.join(BASE_DIR, "lib"))
+        shutil.rmtree(src_dir)
 
         dll_src = os.path.join(BASE_DIR, "bin", "SDL2.dll")
         dll_dst = os.path.join("src", "pyverse", "SDL2.dll")
@@ -80,7 +85,7 @@ def ensure_sdl():
             shutil.copy2(dll_src, dll_dst)
             print(f"Copied SDL2.dll to {dll_dst}")
         else:
-            print(f"Warning: SDL2.dll not found at {dll_src}, wheel may fail!")
+            print(f"Warning: SDL2.dll not found at {dll_src}")
 
     else:
         tar_path = os.path.join(BASE_DIR, os.path.basename(urls["tar"]))
@@ -88,27 +93,31 @@ def ensure_sdl():
         extract_tar(tar_path, BASE_DIR)
         os.remove(tar_path)
 
-        extracted_dirs = [
-            d for d in os.listdir(BASE_DIR)
-            if d.startswith("SDL2") and os.path.isdir(os.path.join(BASE_DIR, d))
-        ]
-        if not extracted_dirs:
-            raise RuntimeError("SDL source folder not found after extraction")
+        src_dir = os.path.join(BASE_DIR, f"SDL2-{SDL_VERSION}")
+        build_dir = os.path.join(BASE_DIR, "build")
+        os.makedirs(build_dir, exist_ok=True)
 
-        hdr_src = os.path.join(BASE_DIR, extracted_dirs[0], "include")
-        hdr_dst = os.path.join(BASE_DIR, "include")
-        if os.path.exists(hdr_dst):
-            shutil.rmtree(hdr_dst)
-        shutil.move(hdr_src, hdr_dst)
+        print("Building SDL2 (static)...")
+        subprocess.check_call([
+            "cmake",
+            src_dir,
+            "-DSDL_SHARED=OFF",
+            "-DSDL_STATIC=ON",
+            "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+            "-DCMAKE_INSTALL_PREFIX=" + BASE_DIR
+        ], cwd=build_dir)
 
-        shutil.rmtree(os.path.join(BASE_DIR, extracted_dirs[0]))
-
-        print("SDL2 headers prepared. You should have lib/ manually placed if needed.")
+        subprocess.check_call([
+            "cmake",
+            "--build", ".",
+            "--config", "Release",
+            "--target", "install"
+        ], cwd=build_dir)
+        print("SDL2 built and installed successfully.")
 
     if not os.path.isfile(include_path):
         print(f"ERROR: SDL2 headers not found at {include_path}")
         sys.exit(1)
-
     print(f"SDL2 is ready at {BASE_DIR}")
 
 if __name__ == "__main__":
