@@ -3,7 +3,7 @@ project(PyVerse LANGUAGES CXX)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
-add_library(pyverse MODULE src/pyverse.cpp)
+add_library(pyverse MODULE src/cpp/pyverse.cpp)
 
 target_include_directories(pyverse PRIVATE ${Python3_INCLUDE_DIRS})
 
