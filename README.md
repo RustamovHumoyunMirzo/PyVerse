@@ -13,7 +13,7 @@ A powerful Python framework for building modern desktop and mobile applications 
 1. **Clone the repository:**
 
     ```bash
-    git clone <repository_url>
+    git clone https://github.com/RustamovHumoyunMirzo/PyVerse.git
     cd PyVerse
     ```
 

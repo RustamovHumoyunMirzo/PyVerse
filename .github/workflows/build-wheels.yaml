@@ -31,7 +31,7 @@ jobs:
           pip install setuptools wheel cmake cibuildwheel
 
       - name: Build wheels
-        run: cibuildwheel --output-dir wheelhouse
+        run: cibuildwheel --output-dir wheelhouse --archs AMD64
 
       - name: List wheels
         run: ls wheelhouse
