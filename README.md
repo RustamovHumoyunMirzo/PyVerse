@@ -42,7 +42,7 @@ A powerful Python framework for building modern desktop and mobile applications 
 You can build cross-platform wheels using [cibuildwheel](https://cibuildwheel.readthedocs.io/):
 
 ```bash
-cibuildwheel --output-dir wheelhouse --archs AMD64
+cibuildwheel --output-dir wheelhouse
 ```
 
 ## Documentation
