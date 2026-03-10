@@ -1,3 +1,5 @@
+"""Utility functions for PyVerse."""
+
 from .units    import pxToDp, dpToPx, pxToSp, remToPx, ptToPx, vwToPx, vhToPx
 from .color    import hex_to_rgb, rgb_to_hex, lighten, darken, contrast_ratio, is_accessible
 from .layout   import clamp, lerp, remap, grid_columns, breakpoint
