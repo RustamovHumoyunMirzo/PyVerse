@@ -36,6 +36,7 @@ ensure_sdl()
 include_dirs = [
     pybind11.get_include(),
     os.path.join(SDL_ROOT, "include"),
+    os.path.join(BASE_DIR, "src", "cpp"),
 ]
 
 library_dirs = []
@@ -72,7 +73,11 @@ else:
 ext_modules = [
     Extension(
         "pyverse.pyverse",
-        ["src/cpp/pyverse.cpp"],
+        [
+            "src/cpp/pyverse.cpp",
+            "src/cpp/app.cpp",
+            "src/cpp/window.cpp",
+        ],
         include_dirs=include_dirs,
         library_dirs=library_dirs,
         libraries=libraries,

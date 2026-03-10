@@ -4,7 +4,10 @@ project(PyVerse LANGUAGES CXX)
 find_package(pybind11 CONFIG REQUIRED)
 
 set(SDL2_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/deps/SDL2/include")
-include_directories(${SDL2_INCLUDE_DIR})
+include_directories(
+    ${SDL2_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/src/cpp
+)
 
 if(WIN32)
     set(SDL2_LIBRARY_DIR "${CMAKE_SOURCE_DIR}/deps/SDL2/lib/x64")

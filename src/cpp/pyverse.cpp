@@ -1,32 +1,15 @@
 #include <pybind11/pybind11.h>
-#include <SDL.h>
+#include "window.h"
+#include "app.h"
 
 namespace py = pybind11;
 
-SDL_Window* window = nullptr;
+PYBIND11_MODULE(pyverse, m)
+{
+    py::class_<Window>(m, "Window")
+        .def(py::init<int, int>())
+        .def("show", &Window::show)
+        .def("destroy", &Window::destroy);
 
-void create_window(int w, int h) {
-    SDL_Init(SDL_INIT_VIDEO);
-
-    window = SDL_CreateWindow(
-        "PyVerse",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        w,
-        h,
-        SDL_WINDOW_SHOWN
-    );
-}
-
-void destroy_window() {
-    if (window) {
-        SDL_DestroyWindow(window);
-        window = nullptr;
-    }
-    SDL_Quit();
-}
-
-PYBIND11_MODULE(pyverse, m) {
-    m.def("create_window", &create_window);
-    m.def("destroy_window", &destroy_window);
+    m.def("_run_engine", &run_engine);
 }
